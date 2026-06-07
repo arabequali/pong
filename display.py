@@ -1,6 +1,5 @@
-import pygame
+import pygame, os, random
 from pygame._sdl2 import Window
-import os
 
 
 class Display:
@@ -23,8 +22,13 @@ class Display:
         show_start = True
         start_count = 0
         in_menu = True
+
         players_size = (self.screen_size[0] / 80, self.screen_size[1] / 10)
         player1_pos = [0 + 3 * players_size[0], self.screen_size[1] / 2 - players_size[1] / 2]
+
+        ball_size = (self.screen_size[0] / 100)
+        ball_pos = [self.screen_size[0] / 2 - ball_size / 2, self.screen_size[1] / 2 - ball_size / 2]
+        dx, dy = random.randint(-10, -5), random.choice([i for i in range(-10, 10) if i])
         
         while running:
             # Events management (alt+f4, button pressed, etc...)
@@ -51,6 +55,27 @@ class Display:
                 else:
                     start_count = -30
             else:
+                if ((int(player1_pos[0] + players_size[0]) + dx >= int(ball_pos[0] - ball_size) >= int(player1_pos[0] + players_size[0]) - dx)
+                and (int(ball_pos[1] - ball_size) <= int(player1_pos[1] + players_size[1])
+                and int(ball_pos[1] + ball_size) >= int(player1_pos[1]))):
+                    print("baguette")
+                    dx = random.randint(5, 10)
+                    dy = random.choice([i for i in range(-10, 10) if i])
+                else:
+                    if self.screen_size[0] - ball_size - dx > ball_pos[0] > ball_size:
+                        pass
+                    elif dx > 0:
+                        dx = random.randint(-10, -5)
+                    else:
+                        dx = random.randint(5, 10)
+                    if self.screen_size[1] - ball_size > ball_pos[1] > ball_size:
+                        pass
+                    elif dy > 0:
+                        dy = random.randint(-10, -5)
+                    else:
+                        dy = random.randint(5, 10)
+                ball_pos[0] += dx
+                ball_pos[1] += dy
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_UP]:
                     if player1_pos[1] < 10:
@@ -63,12 +88,13 @@ class Display:
                     else:
                         player1_pos[1] += 10
                 pygame.draw.rect(self.screen, "black", (player1_pos[0], player1_pos[1], players_size[0], players_size[1]))
+                pygame.draw.circle(self.screen, "black", (ball_pos[0], ball_pos[1]), ball_size)
 
             # flip() the display to put in on screen
             pygame.display.flip()
 
-            # Limit the display to 60 FPS
-            clock.tick(60)
+            # Limit the display to 30 FPS
+            clock.tick(30)
         
         pygame.quit()
 
