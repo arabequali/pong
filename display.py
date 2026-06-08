@@ -1,3 +1,4 @@
+from paddle import Paddle
 import pygame, os, random
 from pygame._sdl2 import Window
 
@@ -23,8 +24,7 @@ class Display:
         start_count = 0
         in_menu = True
 
-        players_size = (self.screen_size[0] / 80, self.screen_size[1] / 10)
-        player1_pos = [0 + 3 * players_size[0], self.screen_size[1] / 2 - players_size[1] / 2]
+        player1 = Paddle(1, self.screen)
 
         ball_size = (self.screen_size[0] / 100)
         ball_pos = [self.screen_size[0] / 2 - ball_size / 2, self.screen_size[1] / 2 - ball_size / 2]
@@ -55,39 +55,26 @@ class Display:
                 else:
                     start_count = -30
             else:
-                if ((int(player1_pos[0] + players_size[0]) + dx >= int(ball_pos[0] - ball_size) >= int(player1_pos[0] + players_size[0]) - dx)
-                and (int(ball_pos[1] - ball_size) <= int(player1_pos[1] + players_size[1])
-                and int(ball_pos[1] + ball_size) >= int(player1_pos[1]))):
-                    print("baguette")
-                    dx = random.randint(5, 10)
-                    dy = random.choice([i for i in range(-10, 10) if i])
+                if self.screen_size[0] - ball_size - dx > ball_pos[0] > ball_size:
+                    pass
+                elif dx > 0:
+                    dx = random.randint(-10, -5)
                 else:
-                    if self.screen_size[0] - ball_size - dx > ball_pos[0] > ball_size:
-                        pass
-                    elif dx > 0:
-                        dx = random.randint(-10, -5)
-                    else:
-                        dx = random.randint(5, 10)
-                    if self.screen_size[1] - ball_size > ball_pos[1] > ball_size:
-                        pass
-                    elif dy > 0:
-                        dy = random.randint(-10, -5)
-                    else:
-                        dy = random.randint(5, 10)
+                    dx = random.randint(5, 10)
+                if self.screen_size[1] - ball_size > ball_pos[1] > ball_size:
+                    pass
+                elif dy > 0:
+                    dy = random.randint(-10, -5)
+                else:
+                    dy = random.randint(5, 10)
                 ball_pos[0] += dx
                 ball_pos[1] += dy
                 keys = pygame.key.get_pressed()
                 if keys[pygame.K_UP]:
-                    if player1_pos[1] < 10:
-                        player1_pos[1] = 0
-                    else:
-                        player1_pos[1] -= 10
+                    player1.go_up()
                 if keys[pygame.K_DOWN]:
-                    if player1_pos[1] > self.screen_size[1] - players_size[1] - 10:
-                        player1_pos[1] = self.screen_size[1] - players_size[1]
-                    else:
-                        player1_pos[1] += 10
-                pygame.draw.rect(self.screen, "black", (player1_pos[0], player1_pos[1], players_size[0], players_size[1]))
+                    player1.go_down()
+                player1.draw()
                 pygame.draw.circle(self.screen, "black", (ball_pos[0], ball_pos[1]), ball_size)
 
             # flip() the display to put in on screen
