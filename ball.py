@@ -1,4 +1,5 @@
 import pygame
+import sys
 from random import randint, choice
 from paddle import Paddle
 
@@ -8,8 +9,8 @@ class Ball:
         self.screen = screen
         self.screen_size = pygame.display.get_window_size()
         self.size = self.screen_size[0] / 100
-        self.x = self.screen_size[0] / 2 - self.size / 2
-        self.y = self.screen_size[1] / 2 - self.size / 2
+        self.x = self.screen_size[0] // 2 - self.size // 2
+        self.y = self.screen_size[1] // 2 - self.size // 2
         self.dx = randint(-10, -5)
         self.dy = choice([i for i in range(-10, 10) if i])
         self.player1 = player1
@@ -17,12 +18,12 @@ class Ball:
 
 
     def movement_x(self) -> None:
-        if not collide_paddle():
+        if not self.collide_paddle():
             if not (self.screen_size[0] - self.size - self.dx > self.x > self.size):
                 if self.dx > 0:
                     self.dx = randint(-10, -5)
                 elif self.dx < 0:
-                    self.dx = randint(5, 10)
+                    sys.exit()
         self.x += self.dx
 
 
@@ -36,16 +37,15 @@ class Ball:
 
 
     def collide_paddle(self) -> bool:
-        ball_vector_center = pygame.math.Vector2(self.x, self.y)
         if self.dx < 0:
-            corner_player = [self.player1.bottomleft, self.player1.bottomright, self.player1.topleft, self.player1.topright]
-            if [p for p in corner_player if pygame.math.Vector2(*p).distance_to(ball_vector_center) <= self.size]:
+            width_player = [x for x in range(self.player1.x - self.dx, self.player1.x + self.player1.size_x - self.dx)]
+            height_player = [y for y in range(self.player1.y, self.player1.y + self.player1.size_y)]
+            if self.x in width_player and self.y in height_player:
                 self.dx = randint(5, 10)
                 return True
         elif self.dx > 0:
             pass
-        else:
-            return False
+        return False
 
 
     def draw(self) -> None:
